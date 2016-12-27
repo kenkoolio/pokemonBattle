@@ -153,10 +153,10 @@
         // (pokemon1.defense > 100? 200 : 100)
 
         //1 attack 2
-        pokemon2.hp = pokemon2.hp - (pokemon1.attack * (pokemon2.defense/200));
+        pokemon2.hp = (pokemon2.hp - (pokemon1.attack * (pokemon2.defense/200))).toFixed(2);
 
         //2 attack 1
-        pokemon1.hp = pokemon1.hp - (pokemon2.attack * (pokemon1.defense/200));
+        pokemon1.hp = (pokemon1.hp - (pokemon2.attack * (pokemon1.defense/200))).toFixed(2);
 
         if (pokemon1.hp<0){
           $('#pokeHP0').html("Fainted");
