@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset="utf-8">
+    <title>Pokemon Battle!</title>
+    <link rel='stylesheet' type='text/css' href='css/style.css'>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <div class='container'>
+
+      <div class='titleDiv'>
+        <h1>Welcome to Pokemon Battle!</h1>
+        <h2>Add a player (limit 2)</h2>
+
+        <div id='createPlayer'>
+          <form id='createForm' method='POST'>
+            <label for='name'>Name</label>
+            <input type='text' name='name' id='name'>
+            <input type='submit' value='Create'>
+          </form>
+
+          <form id='clearPlayers'>
+            <input type='submit' value='Clear all players'>
+          </form>
+        </div>
+      </div><!-- titleDiv -->
+
+      <div id='playersContainer'>
+        <div class='playerDiv' id='player1'>
+          <h2 class='playerName'>Player1</h2>
+          <form class='getCard'>
+            <input type='hidden' name='currentTrainer' value='0'>
+            <input type='submit' value='Draw Pokemon'>
+          </form>
+          <div class='playerCard1'></div>
+        </div><!-- player 1-->
+
+        <div class='playerDiv' id='player2'>
+          <h2 class='playerName'>Player2</h2>
+          <form class='getCard'>
+            <input type='hidden' name='currentTrainer' value='1'>
+            <input type='submit' value='Draw Pokemon'>
+          </form>
+          <div class='playerCard2'></div>
+        </div><!-- player 2-->
+
+        <div id='battleButtonDiv'>
+        </div>
+      </div><!-- playersContainer -->
+
+    </div><!-- container -->
+
+    <script>
+    //background logic
+      var bgArr = [
+        "https://static.pexels.com/photos/248116/pexels-photo-248116.jpeg",
+        "https://static.pexels.com/photos/279734/pexels-photo-279734.jpeg",
+        "https://static.pexels.com/photos/112660/pexels-photo-112660.jpeg",
+        "https://static.pexels.com/photos/207135/pexels-photo-207135.jpeg",
+        "https://static.pexels.com/photos/26750/pexels-photo-26750.jpg",
+        "https://static.pexels.com/photos/101982/pexels-photo-101982.jpeg"
+      ];
+
+      var count = 0;
+
+      (function setBackground(){
+        if (count > bgArr.length-1){
+          count = 0;
+        }
+
+        $("body").css("background-image", "url("+bgArr[count]+")");
+
+        count ++;
+
+        setTimeout( function(){ setBackground() }, 30000);
+      })();
+
+
+    //game logic
+      var players = [];
+      var pokemonOnField = [];
+
+      function loadCards(){
+        var count = 0;
+        pokemonOnField = [];
+        for (var i=0; i<players.length; i++){
+          if(players[i].hand.length > 0){
+            count += 1;
+            var pokemon = players[i].hand[0];
+
+            pokemonOnField.push(pokemon);
+
+            var spriteURL = "http://pokeapi.co"+pokemon.sprite;
+
+            var pokemonCard = "<div class='pokeCardDiv'>";
+                pokemonCard += "<h3>"+pokemon.name+"</h3>";
+                pokemonCard += "<img class='sprite' src="+spriteURL+" >";
+                pokemonCard += "<p id='pokeHP"+i+"'>HP: "+pokemon.hp+"</p>";
+                pokemonCard += "<p>Ability: "+pokemon.abilities[0]+"</p>";
+                pokemonCard += "<p>Atk: "+pokemon.attack+"</p>";
+                pokemonCard += "<p>Def: "+pokemon.defense+"</p>";
+                pokemonCard += "</div>";
+            $('.playerCard'+(i+1)).html(pokemonCard);
+          }
+        }
+
+        if (count == 2){
+          var battleButton = "<button id='battleButton'>Battle!</button>";
+          $('#battleButtonDiv').html(battleButton);
+        }
+      }
+
+      function clearPlayers(){
+        if (players.length > 0){
+          for (var i=0, j=players.length; i<j; i++){
+            $('#player'+(i+1)+' > h2').text('Player'+(i+1));
+            players.pop();
+          }
+        }
+      }
+
+      function addPlayers(res){
+        for (var i=0; i<res.length; i++){
+          $('#player'+(i+1)+' > h2').text(res[i].name);
+          players.push(res[i]);
+        }
+      }
+
+      function playersIndex(){
+        $.get('/players', function(res){
+          clearPlayers();
+          addPlayers(res);
+          loadCards();
+        });
+      }
+
+      //battleButton
+      $(document).on('click', '#battleButton', function(){
+        console.log('Battle Begin!');
+
+        var player1 = players[0];
+        var player2 = players[1];
+        var pokemon1 = pokemonOnField[0];
+        var pokemon2 = pokemonOnField[1];
+
+        // pokemon1.attack = pokemon1.attack > 100 ? 100 : pokemon1.attack;
+        // pokemon2.attack = pokemon2.attack > 100 ? 100 : pokemon2.attack;
+
+        // pokemon1.defense = pokemon1.defense > 100 ? 100 : pokemon1.defense;
+        // pokemon2.defense = pokemon2.defense > 100 ? 100 : pokemon2.defense;
+        // (pokemon2.defense > 100? 200 : 100)
+        // (pokemon1.defense > 100? 200 : 100)
+
+        //1 attack 2
+        pokemon2.hp = pokemon2.hp - (pokemon1.attack * (pokemon2.defense/200));
+
+        //2 attack 1
+        pokemon1.hp = pokemon1.hp - (pokemon2.attack * (pokemon1.defense/200));
+
+        if (pokemon1.hp<0){
+          $('#pokeHP0').html("Fainted");
+          $('#pokeHP0').addClass('fainted');
+          $('#battleButton').attr('disabled', 'disabled');
+          window.alert(player2.name+" wins!");
+        } else if (pokemon1.hp>0){
+          $('#pokeHP0').html(pokemon1.hp);
+        }
+
+        if (pokemon2.hp<0){
+          $('#pokeHP1').html("Fainted");
+          $('#pokeHP1').addClass('fainted');
+          $('#battleButton').attr('disabled', 'disabled');
+          window.alert(player1.name+" wins!");
+        } else if (pokemon2.hp>0){
+          $('#pokeHP1').html(pokemon2.hp);
+        }
+
+      })
+
+      $('.getCard').on('submit', function(){
+        if(players.length<2){
+          window.alert('Hey! You need 2 players to battle, punks');
+        } else {
+          $.post('/getCard', $(this).serialize(), function(res){
+            console.log(res);
+            playersIndex();
+            console.log(players);
+          }, 'json');
+        }
+        return false;
+      })
+
+
+      $('#createForm').on('submit', function(){
+        $.post('/create', $(this).serialize(), function(res){
+          console.log(res);
+
+          //if one player exists, it will delete the player and reload both in addPlayers(). addPlayers() finds all players in backend and loads them all, that is why it is necessary to delete current array of players or else will have duplicates
+          clearPlayers();
+          addPlayers(res);
+
+        }, 'json');
+        $('input#name').val("");
+        return false;
+      });
+
+      $('#clearPlayers').on('submit', function(){
+        //clear players in back end as well as in front end array
+        $.get('/clear', function(res){
+          console.log(res);
+          clearPlayers();
+        });
+        return false;
+      })
+
+    </script>
+  </body>
+</html>

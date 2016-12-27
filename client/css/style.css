@@ -1,0 +1,78 @@
+html, body{
+  box-sizing: border-box;
+  margin: 0;
+  background-size: cover;
+  background-repeat: no-repeat;
+  font-family: tahoma, arial, sans-serif;
+}
+.container {
+  width: 90%;
+  padding: 30px;
+  margin: 5px auto;
+}
+
+.titleDiv {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+#playersContainer{
+  height: 600px;
+  margin: 5px auto;
+}
+  .playerDiv {
+    vertical-align: top;
+    display: inline-block;
+    width: 49%;
+    height: 90%;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.4);
+  }
+
+form {
+  display: inline-block;
+}
+
+.playerName {
+  text-align: center;
+}
+
+.pokeCardDiv {
+  width: 60%;
+  margin: 10px auto;
+  border: 10px solid goldenrod;
+  height: 100%;
+  border-radius: 3%;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+.playerCard1, .playerCard2 {
+  height: 72%;
+  text-align: center;
+}
+
+.sprite {
+  width: 40%;
+}
+
+#battleButtonDiv {
+  text-align: center;
+}
+
+  #battleButton {
+    width: 100px;
+    height: 30px;
+    box-shadow: 10px 5px 3px #888888;
+    background-color: red;
+    color: white;
+    border: 1px solid white;
+    border-radius: 2px;
+  }
+
+.fainted {
+  color: red;
+  font-size: 1.15em;
+}
