@@ -111,6 +111,12 @@
         }
       }
 
+      function clearPokemonCards(){
+        for (var i=1; i<3; i++){
+          $('.playerCard'+i).html("<div></div>");
+        }
+      }
+
       function clearPlayers(){
         if (players.length > 0){
           for (var i=0, j=players.length; i<j; i++){
@@ -210,6 +216,7 @@
         $.get('/clear', function(res){
           console.log(res);
           clearPlayers();
+          clearPokemonCards();
         });
         return false;
       })
